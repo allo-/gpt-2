@@ -85,6 +85,30 @@ def interact_model(
             while not raw_text:
                 print('Prompt should not be empty!')
                 raw_text = input("Model prompt >>> ")
+
+            try:
+                if raw_text.startswith("!length"):
+                    _, new_length = raw_text.split(" ")
+                    length = int(new_length)
+                if raw_text.startswith("!temp"):
+                    _, new_temperature = raw_text.split(" ")
+                    temperature = float(new_temperature)
+                if raw_text.startswith("!top_k"):
+                    _, new_top_k = raw_text.split(" ")
+                    top_k = int(new_top_k)
+            except ValueError:
+                print("Invalid value")
+                continue
+            if raw_text.startswith("!"):
+                print("Changing model parameters: length={}, "
+                "temperature={}, top_k={}".format(length, temperature, top_k))
+                output = sample.sample_sequence(
+                    hparams=hparams, length=length,
+                    context=context,
+                    batch_size=batch_size,
+                    temperature=temperature, top_k=top_k
+                )
+                continue
             context_tokens = enc.encode(raw_text)
             generated = 0
             for _ in range(nsamples // batch_size):
