@@ -204,7 +204,7 @@ def main():
                             avg_loss[1] * avg_coeff + 1.0)
 
                 print(
-                    '[{counter} | {time:2.2f}] loss={loss:2.4f} avg={avg:2.4f}'
+                    '[{counter} | {time:2.2f}] loss={loss:2.6f} avg={avg:2.6f}'
                     .format(
                         counter=counter,
                         time=time.time() - start_time,
