@@ -80,11 +80,26 @@ def interact_model(
         print("The model has", total_parameters, "parameters")
 
 
+        multi_line_input = False
         while True:
-            raw_text = input("Model prompt >>> ")
-            while not raw_text:
-                print('Prompt should not be empty!')
+            if multi_line_input:
+                raw_text = ""
+                while not raw_text:
+                    line = input('Model prompt (end the prompt with "END") >>> ')
+                    while line != "END":
+                        raw_text += line + "\n"
+                        line = input(">>> ")
+                        if line.startswith("!"):
+                            break
+                    if not raw_text:
+                        print('Prompt should not be empty!')
+                raw_text = raw_text.strip()
+                raw_text = raw_text.replace("NEWLINE", "") # allow to add new lines the end as NL
+            else:
                 raw_text = input("Model prompt >>> ")
+                while not raw_text:
+                    print('Prompt should not be empty!')
+                    raw_text = input("Model prompt >>> ")
 
             try:
                 if raw_text.startswith("!length"):
@@ -96,12 +111,21 @@ def interact_model(
                 if raw_text.startswith("!top_k"):
                     _, new_top_k = raw_text.split(" ")
                     top_k = int(new_top_k)
+                if raw_text.startswith("!nsamples"):
+                    _, nsamples = raw_text.split(" ")
+                    nsamples = int(nsamples)
+                if raw_text.startswith("!multiline"):
+                    multi_line_input = not multi_line_input
             except ValueError:
                 print("Invalid value")
                 continue
+
             if raw_text.startswith("!"):
                 print("Changing model parameters: length={}, "
-                "temperature={}, top_k={}".format(length, temperature, top_k))
+                "temperature={}, top_k={}, nsamples={}, "
+                "multiline={}".format(length, temperature, top_k,
+                    nsamples, multi_line_input))
+
                 output = sample.sample_sequence(
                     hparams=hparams, length=length,
                     context=context,
@@ -109,6 +133,10 @@ def interact_model(
                     temperature=temperature, top_k=top_k
                 )
                 continue
+
+            print('')
+            print('')
+            print('Generating samples ...')
             context_tokens = enc.encode(raw_text)
             generated = 0
             for _ in range(nsamples // batch_size):
@@ -120,6 +148,7 @@ def interact_model(
                     text = enc.decode(out[i])
                     print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
                     print(text)
+                    print()
             print("=" * 80)
 
 if __name__ == '__main__':
