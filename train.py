@@ -20,7 +20,8 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('--dataset', metavar='PATH', type=str, required=True, help='Input file, directory, or glob pattern (utf-8 text, or preencoded .npz files).')
-parser.add_argument('--model_name', metavar='MODEL', type=str, default='117MSP', help='Pretrained model name')
+parser.add_argument('--model_name', metavar='MODEL', type=str, default='117MSP', help='Model name')
+parser.add_argument('--model_dir', metavar='MODELDIR', type=str, default='models', help='Models directory')
 parser.add_argument('--combine', metavar='CHARS', type=int, default=50000, help='Concatenate input files with <|endoftext|> separator into chunks of this minimum size')
 
 parser.add_argument('--batch_size', metavar='SIZE', type=int, default=1, help='Batch size')
@@ -46,7 +47,7 @@ def maketree(path):
 
 def main():
     args = parser.parse_args()
-    enc = encoder.get_encoder(args.model_name)
+    enc = encoder.get_encoder(args.model_name, args.model_dir)
     hparams = model.default_hparams()
     with open(os.path.join('models', args.model_name, 'hparams.json')) as f:
         hparams.override_from_dict(json.load(f))
