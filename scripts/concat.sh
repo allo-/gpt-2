@@ -12,6 +12,7 @@ OUTPUT=$(readlink -f "$2")
 rm "$OUTPUT"
 for f in "$INPUT"/*.txt
 do
-  cat "$f" | sed 's#$#<|n|>#g' >> "$OUTPUT"
+  cat "$f" | sed 's/^\s*//g;s/\s*$//g;s@<[a-zA-Z0-9/]*>@@g' | sed 's#$#<|n|>#g' >> "$OUTPUT"
+  echo "" >> "$OUTPUT" # Insert a newline before endoftext marker
   echo "<|endoftext|>" >> "$OUTPUT"
 done
