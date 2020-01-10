@@ -151,7 +151,7 @@ def main():
                 fp.write(str(counter) + '\n')
 
         def generate_samples():
-            context_tokens = data_sampler.sample(128)
+            context_tokens = data_sampler.sample(1)
             all_text = []
             index = 0
             while index < args.sample_num:
