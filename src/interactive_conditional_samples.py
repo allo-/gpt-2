@@ -146,6 +146,7 @@ def interact_model(
                 for i in range(batch_size):
                     generated += 1
                     text = enc.decode(out[i])
+                    text = "\n".join([line.strip() for line in text.split("\n")])
                     print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
                     print(text)
                     print()

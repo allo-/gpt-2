@@ -69,6 +69,7 @@ def sample_model(
                 generated += batch_size
                 text = enc.decode(out[i])
                 print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
+                text = "\n".join([line.strip() for line in text.split("\n")])
                 print(text)
 
 if __name__ == '__main__':
