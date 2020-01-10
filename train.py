@@ -56,6 +56,8 @@ def main():
             "Can't get samples longer than window size: %s" % hparams.n_ctx)
 
     CHECKPOINT_DIR = os.path.join('models', args.model_name, 'checkpoint')
+    LEARNLOG_FILENAME = os.path.join('models', args.model_name, 'learnlog.txt')
+    learnlog_file = open(LEARNLOG_FILENAME, "a")
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     with tf.Session(config=config) as sess:
@@ -210,11 +212,19 @@ def main():
                         time=time.time() - start_time,
                         loss=v_loss,
                         avg=avg_loss[0] / avg_loss[1]))
+                learnlog_file.write('[{counter} | {time:2.2f}] loss={loss:2.4f} avg={avg:2.4f}\n'
+                    .format(
+                        counter=counter,
+                        time=time.time() - start_time,
+                        loss=v_loss,
+                        avg=avg_loss[0] / avg_loss[1]))
+                learnlog_file.flush()
 
                 counter += 1
         except KeyboardInterrupt:
             print('interrupted')
             save()
+            learnlog_file.close()
 
 
 if __name__ == '__main__':
