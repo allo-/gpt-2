@@ -13,5 +13,5 @@ class Encoder:
     def decode(self, tokens):
         return self.sp.DecodeIds(tokens.tolist()).replace('<|n|>', '\n')
 
-def get_encoder(model_name):
-    return Encoder(os.path.join('models', model_name, 'sp.model'))
+def get_encoder(model_name, models_dir):
+    return Encoder(os.path.join(models_dir, model_name, 'sp.model'))
