@@ -148,7 +148,7 @@ def main():
             os.path.join(CHECKPOINT_DIR, args.run_name))
 
         saver = tf.train.Saver(
-            var_list=all_vars,
+        #   var_list=all_vars,
             max_to_keep=5)
         sess.run(tf.global_variables_initializer())
 
