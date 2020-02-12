@@ -52,17 +52,17 @@ def train_main(dataset,
 
     # TF config
 
-    config = tf.ConfigProto()
+    config = tf.compat.v1.ConfigProto()
     config.gpu_options.visible_device_list = str(hvd.local_rank())
     config.gpu_options.allow_growth = True
 
-    with tf.Session(config=config) as sess:
-        context = tf.placeholder(tf.int32, [batch_size, None])
+    with tf.compat.v1.Session(config=config) as sess:
+        context = tf.compat.v1.placeholder(tf.int32, [batch_size, None])
         np.random.seed(seed)
-        tf.set_random_seed(seed)
+        tf.compat.v1.set_random_seed(seed)
         output = model.model(hparams=hparams, X=context)
         loss = tf.reduce_mean(
-            tf.nn.sparse_softmax_cross_entropy_with_logits(
+            input_tensor=tf.nn.sparse_softmax_cross_entropy_with_logits(
                 labels=context[:, 1:], logits=output['logits'][:, :-1]))
 
         tf_sample = sample.sample_sequence(
@@ -73,9 +73,9 @@ def train_main(dataset,
             temperature=0.8,
             top_k=40)
 
-        train_vars = [v for v in tf.trainable_variables() if 'model' in v.name]
+        train_vars = [v for v in tf.compat.v1.trainable_variables() if 'model' in v.name]
 
-        opt = tf.train.AdamOptimizer()
+        opt = tf.compat.v1.train.AdamOptimizer()
         opt = hvd.DistributedOptimizer(opt)
         train_op = opt.minimize(loss, var_list=train_vars)
 
@@ -84,12 +84,12 @@ def train_main(dataset,
         # training is started with random weights or restored from a checkpoint.
         bcast = hvd.broadcast_global_variables(0)
 
-        saver = tf.train.Saver(
+        saver = tf.compat.v1.train.Saver(
             var_list=train_vars,
             max_to_keep=5,
             keep_checkpoint_every_n_hours=2)
 
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
 
 
         if restore_from == 'latest':

@@ -52,9 +52,9 @@ def sample_model(
     elif length > hparams.n_ctx:
         raise ValueError("Can't get samples longer than window size: %s" % hparams.n_ctx)
 
-    with tf.Session(graph=tf.Graph()) as sess:
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
         np.random.seed(seed)
-        tf.set_random_seed(seed)
+        tf.compat.v1.set_random_seed(seed)
 
         output = sample.sample_sequence(
             hparams=hparams, length=length,
@@ -63,7 +63,7 @@ def sample_model(
             temperature=temperature, top_k=top_k, top_p=top_p
         )[:, 1:]
 
-        saver = tf.train.Saver()
+        saver = tf.compat.v1.train.Saver()
         ckpt = tf.train.latest_checkpoint(os.path.join('models', model_name, 'checkpoint/%s' % run_name))
         saver.restore(sess, ckpt)
 

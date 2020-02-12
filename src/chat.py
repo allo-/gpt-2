@@ -27,7 +27,7 @@ def interact_model(
         batch_size = 1
     assert nsamples % batch_size == 0
     np.random.seed(seed)
-    tf.set_random_seed(seed)
+    tf.compat.v1.set_random_seed(seed)
 
     enc = encoder.get_encoder(model_name)
     hparams = model.default_hparams()
@@ -39,8 +39,8 @@ def interact_model(
     elif length > hparams.n_ctx:
         raise ValueError("Can't get samples longer than window size: %s" % hparams.n_ctx)
 
-    with tf.Session(graph=tf.Graph()) as sess:
-        context = tf.placeholder(tf.int32, [batch_size, None])
+    with tf.compat.v1.Session(graph=tf.Graph()) as sess:
+        context = tf.compat.v1.placeholder(tf.int32, [batch_size, None])
         output = sample.sample_sequence(
             hparams=hparams, length=length,
             context=context,
@@ -48,7 +48,7 @@ def interact_model(
             temperature=temperature, top_k=top_k
         )
 
-        saver = tf.train.Saver()
+        saver = tf.compat.v1.train.Saver()
         ckpt = tf.train.latest_checkpoint(os.path.join('models', model_name, "checkpoint/%s" % run_name))
         saver.restore(sess, ckpt)
 
